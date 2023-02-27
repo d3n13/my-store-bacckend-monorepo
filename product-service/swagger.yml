@@ -1,0 +1,71 @@
+openapi: 3.0.3
+info:
+  title: product-service
+  version: 1.0.0
+servers:
+  - url: https://mrhuth8q01.execute-api.eu-west-2.amazonaws.com/dev
+tags:
+  - name: products
+    description: All about the products
+paths:
+  /products/{productId}:
+    get:
+      parameters:
+        - name: productId
+          in: path
+          description: Product ID to search for
+          required: true
+          schema:
+            type: integer
+            format: int64
+      tags:
+        - products
+      summary: Find product by id
+      description: Find product by id if it exists
+      operationId: productsFindById
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Not found
+  /products:
+    get:
+      tags:
+        - products
+      summary: List all products
+      description: List all products
+      operationId: productsListAll
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '404':
+          description: Invalid status value
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        price:
+          type: integer
+          format: int32
+          example: 7
+        name:
+          type: string
+        description:
+          type: string
+        title:
+          type: string
