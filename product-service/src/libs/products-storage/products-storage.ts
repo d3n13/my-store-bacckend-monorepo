@@ -4,7 +4,6 @@ import { flatten } from "@libs/utils";
 import { DynamoDB } from "aws-sdk";
 
 import { NotFoundError } from "../errors";
-import { mockedData } from "./mocked-data";
 
 const documentClient = new DynamoDB.DocumentClient({
   apiVersion: "2012-08-10",
@@ -35,14 +34,35 @@ async function getAll(): Promise<Product[]> {
   return products;
 }
 
-function getById(productId: number) {
-  const item = mockedData.find(({ id }) => productId === id);
+async function getById(productId: string) {
+  const [item, stock] = await Promise.all([
+    documentClient
+      .get({
+        Key: {
+          id: productId,
+        },
+        TableName: PRODUCTS_TABLE_NAME,
+      })
+      .promise()
+      .then(({ Item }) => Item as ProductModel),
+    documentClient
+      .get({
+        Key: {
+          product_id: productId,
+        },
+        TableName: STOCKS_TABLE_NAME,
+      })
+      .promise()
+      .then(({ Item }) => Item as StockModel),
+  ]);
 
-  if (!item) {
+  if (!item || !stock) {
     throw new NotFoundError(`Product with id=${productId} was not found`);
   }
 
-  return Promise.resolve(item);
+  const product: Product = { ...item, count: stock.count };
+
+  return Promise.resolve(product);
 }
 
 export const productsStorage = {
