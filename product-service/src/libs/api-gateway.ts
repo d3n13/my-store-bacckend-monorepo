@@ -16,6 +16,7 @@ export type ValidatedEventAPIGatewayProxyEvent<S> = Handler<
 const ALLOWED_ORIGINS_MAP = {
   "https://d1hip2isccotrp.cloudfront.net": true,
   "http://localhost:3000": true,
+  "https://editor.swagger.io": true,
 };
 function isAllowedOrigin(origin: string) {
   return !!ALLOWED_ORIGINS_MAP[origin];
