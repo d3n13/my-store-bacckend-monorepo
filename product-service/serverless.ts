@@ -2,6 +2,7 @@ import type { AWS } from "@serverless/typescript";
 
 import getProductsList from "@functions/getProductsList";
 import getProductsById from "@functions/getProductsById";
+import { PRODUCTS_TABLE_NAME, STOCKS_TABLE_NAME } from "@libs/env";
 
 const serverlessConfiguration: AWS = {
   service: "product-service",
@@ -11,6 +12,22 @@ const serverlessConfiguration: AWS = {
     name: "aws",
     region: "eu-west-2",
     runtime: "nodejs14.x",
+    iamRoleStatements: [
+      {
+        Effect: "Allow",
+        Action: [
+          "dynamodb:DescribeTable",
+          "dynamodb:Query",
+          "dynamodb:Scan",
+          "dynamodb:GetItem",
+          "dynamodb:BatchGetItem",
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:DeleteItem",
+        ],
+        Resource: "*",
+      },
+    ],
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
@@ -27,7 +44,7 @@ const serverlessConfiguration: AWS = {
       productsTable: {
         Type: "AWS::DynamoDB::Table",
         Properties: {
-          TableName: "products",
+          TableName: PRODUCTS_TABLE_NAME,
           AttributeDefinitions: [
             {
               AttributeName: "id",
@@ -49,7 +66,7 @@ const serverlessConfiguration: AWS = {
       stocksTable: {
         Type: "AWS::DynamoDB::Table",
         Properties: {
-          TableName: "stocks",
+          TableName: STOCKS_TABLE_NAME,
           AttributeDefinitions: [
             {
               AttributeName: "product_id",
