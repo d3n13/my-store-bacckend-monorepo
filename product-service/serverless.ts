@@ -6,7 +6,7 @@ import getProductsById from "@functions/getProductsById";
 const serverlessConfiguration: AWS = {
   service: "product-service",
   frameworkVersion: "3",
-  plugins: ["serverless-esbuild"],
+  plugins: ["serverless-esbuild", "serverless-dynamodb-seed"],
   provider: {
     name: "aws",
     region: "eu-west-2",
@@ -20,9 +20,56 @@ const serverlessConfiguration: AWS = {
       NODE_OPTIONS: "--enable-source-maps --stack-trace-limit=1000",
     },
   },
-  // import the function via paths
   functions: { getProductsList, getProductsById },
   package: { individually: true },
+  resources: {
+    Resources: {
+      productsTable: {
+        Type: "AWS::DynamoDB::Table",
+        Properties: {
+          TableName: "products",
+          AttributeDefinitions: [
+            {
+              AttributeName: "id",
+              AttributeType: "S",
+            },
+          ],
+          KeySchema: [
+            {
+              AttributeName: "id",
+              KeyType: "HASH",
+            },
+          ],
+          ProvisionedThroughput: {
+            ReadCapacityUnits: 1,
+            WriteCapacityUnits: 1,
+          },
+        },
+      },
+      stocksTable: {
+        Type: "AWS::DynamoDB::Table",
+        Properties: {
+          TableName: "stocks",
+          AttributeDefinitions: [
+            {
+              AttributeName: "product_id",
+              AttributeType: "S",
+            },
+          ],
+          KeySchema: [
+            {
+              AttributeName: "product_id",
+              KeyType: "HASH",
+            },
+          ],
+          ProvisionedThroughput: {
+            ReadCapacityUnits: 1,
+            WriteCapacityUnits: 1,
+          },
+        },
+      },
+    },
+  },
   custom: {
     esbuild: {
       bundle: true,
@@ -33,6 +80,16 @@ const serverlessConfiguration: AWS = {
       define: { "require.resolve": undefined },
       platform: "node",
       concurrency: 10,
+    },
+    seed: {
+      seedProducts: {
+        table: "products",
+        sources: ["./db-seeds/products.json"],
+      },
+      seedStocks: {
+        table: "stocks",
+        sources: ["./db-seeds/stocks.json"],
+      },
     },
   },
 };
