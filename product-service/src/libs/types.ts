@@ -13,3 +13,5 @@ export type StockModel = {
 };
 
 export type Product = ProductModel & Pick<StockModel, "count">;
+
+export type CreateProductPayload = Omit<ProductModel, "id">;

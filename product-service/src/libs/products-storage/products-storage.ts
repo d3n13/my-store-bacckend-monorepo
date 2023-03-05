@@ -65,7 +65,31 @@ async function getById(productId: string) {
   return Promise.resolve(product);
 }
 
+async function store(product: ProductModel) {
+  await documentClient
+    .transactWrite({
+      TransactItems: [
+        {
+          Put: {
+            Item: product,
+            TableName: PRODUCTS_TABLE_NAME,
+          },
+        },
+        {
+          Put: {
+            Item: { count: 0, product_id: product.id },
+            TableName: STOCKS_TABLE_NAME,
+          },
+        },
+      ],
+    })
+    .promise();
+
+  return await getById(product.id);
+}
+
 export const productsStorage = {
   getAll,
   getById,
+  store,
 };

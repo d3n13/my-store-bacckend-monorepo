@@ -14,7 +14,9 @@
   },
   "dependencies": {
     "@middy/core": "^3.4.0",
-    "@middy/http-json-body-parser": "^3.4.0"
+    "@middy/http-json-body-parser": "^3.4.0",
+    "joi": "^17.8.3",
+    "uuidv4": "^6.2.13"
   },
   "devDependencies": {
     "@serverless/typescript": "^3.0.0",
