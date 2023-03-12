@@ -8,7 +8,9 @@ export const handler: ValidatedEventAPIGatewayProxyEvent<void> = async (
   event
 ) => {
   try {
-    const productId = parseInt(event.pathParameters.productId);
+    console.log(JSON.stringify(event));
+
+    const productId = event.pathParameters.productId;
     const product = await getProductsById(productId);
 
     return formatJSONResponse(product, event.headers.origin);

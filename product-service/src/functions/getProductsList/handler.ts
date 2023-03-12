@@ -6,6 +6,8 @@ import { getProductsList } from "./getProductsList";
 
 const handler: ValidatedEventAPIGatewayProxyEvent<void> = async (event) => {
   try {
+    console.log(JSON.stringify(event));
+
     const products = await getProductsList();
 
     return formatJSONResponse(products, event.headers.origin);

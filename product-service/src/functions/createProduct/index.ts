@@ -8,7 +8,7 @@ const awsFunction: ValueOf<AWS["functions"]> = {
   events: [
     {
       http: {
-        method: "get",
+        method: "post",
         path: "/products",
         cors: true,
       },

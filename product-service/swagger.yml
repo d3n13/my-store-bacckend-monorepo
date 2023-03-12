@@ -24,15 +24,40 @@ paths:
       description: Find product by id if it exists
       operationId: productsFindById
       responses:
-        '200':
+        "200":
           description: Successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Product'
-        '404':
+                $ref: "#/components/schemas/Product"
+        "404":
           description: Not found
   /products:
+    post:
+      tags:
+        - products
+      summary: Create a product
+      description: Create a product
+      operationId: productsCreate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProductRequest"
+            example:
+              title: "Some title"
+              description: "Some description"
+              price: 123
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "400":
+          description: Invalid request
     get:
       tags:
         - products
@@ -40,31 +65,38 @@ paths:
       description: List all products
       operationId: productsListAll
       responses:
-        '200':
+        "200":
           description: Successful operation
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Product'
-        '404':
+                  $ref: "#/components/schemas/Product"
+        "404":
           description: Invalid status value
 components:
   schemas:
-    Product:
+    CreateProductRequest:
       type: object
       properties:
-        id:
-          type: integer
-          format: int64
-          example: 10
         price:
           type: integer
           format: int32
           example: 7
-        name:
+        description:
           type: string
+        title:
+          type: string
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+        price:
+          type: integer
+          format: int32
+          example: 7
         description:
           type: string
         title:
