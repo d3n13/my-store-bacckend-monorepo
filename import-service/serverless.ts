@@ -1,6 +1,7 @@
 import type { AWS } from "@serverless/typescript";
 
 import importProductsFile from "@functions/importProductsFile";
+import importFileParser from "@functions/importFileParser";
 
 const serverlessConfiguration: AWS = {
   service: "import-service",
@@ -13,13 +14,7 @@ const serverlessConfiguration: AWS = {
     iamRoleStatements: [
       {
         Effect: "Allow",
-        Action: [
-          "s3:PutObject",
-          "s3:PutObjectAcl",
-          "s3:GetObject",
-          "s3:GetObjectAcl",
-          "s3:DeleteObject",
-        ],
+        Action: ["s3:*"],
         Resource: [
           "arn:aws:s3:::import-service-csv-starage50830459",
           "arn:aws:s3:::import-service-csv-starage50830459/*",
@@ -36,7 +31,7 @@ const serverlessConfiguration: AWS = {
       NODE_OPTIONS: "--enable-source-maps --stack-trace-limit=1000",
     },
   },
-  functions: { importProductsFile },
+  functions: { importProductsFile, importFileParser },
   package: { individually: true },
   custom: {
     esbuild: {
