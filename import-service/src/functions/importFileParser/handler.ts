@@ -4,37 +4,36 @@ import parseCsv from "csv-parser";
 const AWS_S3_BUCKET_NAME = "import-service-csv-starage50830459";
 
 type S3ObjectRecord = {
-  // TODO
-  eventVersion: "2.1";
-  eventSource: "aws:s3";
-  awsRegion: "eu-west-2";
-  eventTime: "2023-03-12T21:11:43.635Z";
-  eventName: "ObjectCreated:Put";
+  eventVersion: string;
+  eventSource: string;
+  awsRegion: string;
+  eventTime: string;
+  eventName: string;
   userIdentity: {
-    principalId: "AWS:AROAZEJRX3EGYYYOO6UOV:import-service-dev-importProductsFile";
+    principalId: string;
   };
   requestParameters: {
-    sourceIPAddress: "37.252.94.137";
+    sourceIPAddress: string;
   };
   responseElements: {
-    "x-amz-request-id": "MMDWZ28VQWJTRD8M";
-    "x-amz-id-2": "WSTtPL4NVXHYZd4R9BKmeHVzpa8Geb38RMJ58WkjxH5m6YSo5diBQGSJC9dgUoOOuFeuFK/xFsteUknDiaki3Gjj/Z+pITF0mapHMKDolNc=";
+    "x-amz-request-id": string;
+    "x-amz-id-2": string;
   };
   s3: {
-    s3SchemaVersion: "1.0";
-    configurationId: "import-service-dev-importFileParser-9eceafef0fe575eb52543c9070542d86";
+    s3SchemaVersion: string;
+    configurationId: string;
     bucket: {
-      name: "import-service-csv-starage50830459";
+      name: string;
       ownerIdentity: {
-        principalId: "A3E9ICFDWQETVO";
+        principalId: string;
       };
-      arn: "arn:aws:s3:::import-service-csv-starage50830459";
+      arn: string;
     };
     object: {
-      key: "uploaded/Untitled%2520spreadsheet%2520-%2520Sheet2.csv";
-      size: 1770;
-      eTag: "e4bb239bedc2b4a00fe7f76337eb67fe";
-      sequencer: "00640E400F9928C7EB";
+      key: string;
+      size: number;
+      eTag: string;
+      sequencer: string;
     };
   };
 };
