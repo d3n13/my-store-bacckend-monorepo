@@ -1,7 +1,10 @@
-import { s3Client } from "@libs/s3-client";
 import parseCsv from "csv-parser";
+import { s3Client } from "@libs/s3-client";
+import { sqsClient } from "@libs/sqsClient";
 
 const AWS_S3_BUCKET_NAME = "import-service-csv-starage50830459";
+const AWS_SQS_CATALOG_ITEMS_QUEUE_URL =
+  "https://sqs.eu-west-2.amazonaws.com/627706419469/catalogItemsQueue";
 
 type S3ObjectRecord = {
   eventVersion: string;
@@ -54,23 +57,51 @@ const importFileParser = async (event: { Records: S3ObjectRecord[] }) => {
             })
             .createReadStream()
             .pipe(parseCsv())
-            .on("error", (err) => reject(err))
-            .on("data", (data) => console.log(JSON.stringify(data)))
+            .on("error", (error) => {
+              console.error(JSON.stringify(error));
+              reject(error);
+            })
+            .on("data", (data) => {
+              const messageBody = JSON.stringify(data);
+
+              return sqsClient
+                .sendMessage({
+                  MessageBody: messageBody,
+                  QueueUrl: AWS_SQS_CATALOG_ITEMS_QUEUE_URL,
+                })
+                .promise();
+            })
             .on("end", async () => {
+              const destinationKey = object.key
+                .replace("uploaded/", "parsed/")
+                .split("/")
+                .map((part) =>
+                  part.endsWith(".csv")
+                    ? Date.now() + "_" + part // Support files with the same name
+                    : part
+                )
+                .join("/");
+
               await s3Client
                 .copyObject({
                   CopySource: `${bucket.name}/${object.key}`,
                   Bucket: bucket.name,
-                  Key: object.key.replace("uploaded/", "parsed/"),
+                  Key: destinationKey,
                 })
-                .promise();
+                .promise()
+                .then(() => {
+                  console.log(`Copied to ${destinationKey}`);
+                });
 
               await s3Client
                 .deleteObject({
                   Bucket: AWS_S3_BUCKET_NAME,
                   Key: object.key,
                 })
-                .promise();
+                .promise()
+                .then(() => {
+                  console.log(`Deleted ${object.key}`);
+                });
 
               resolve();
             })
