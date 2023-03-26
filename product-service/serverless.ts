@@ -3,6 +3,7 @@ import type { AWS } from "@serverless/typescript";
 import getProductsList from "@functions/getProductsList";
 import getProductsById from "@functions/getProductsById";
 import createProduct from "@functions/createProduct";
+import catalogBatchProcess from "@functions/catalogBatchProcess";
 import { PRODUCTS_TABLE_NAME, STOCKS_TABLE_NAME } from "@libs/env";
 
 const serverlessConfiguration: AWS = {
@@ -28,6 +29,11 @@ const serverlessConfiguration: AWS = {
         ],
         Resource: "*",
       },
+      {
+        Effect: "Allow",
+        Action: ["sns:Publish"],
+        Resource: ["arn:aws:sns:::createProductTopic"],
+      },
     ],
     apiGateway: {
       minimumCompressionSize: 1024,
@@ -38,10 +44,52 @@ const serverlessConfiguration: AWS = {
       NODE_OPTIONS: "--enable-source-maps --stack-trace-limit=1000",
     },
   },
-  functions: { createProduct, getProductsList, getProductsById },
+  functions: {
+    createProduct,
+    getProductsList,
+    getProductsById,
+    catalogBatchProcess,
+  },
   package: { individually: true },
   resources: {
     Resources: {
+      createProductTopic: {
+        Type: "AWS::SNS::Topic",
+        Properties: {
+          TopicName: "createProductTopic",
+        },
+      },
+      emailSubscription: {
+        Type: "AWS::SNS::Subscription",
+        Properties: {
+          Protocol: "Email",
+          Endpoint:
+            process.env.AWS_PRODUCT_SERVICE_CREATE_PRODUCT_NOTIFICATION_EMAIL,
+          TopicArn: {
+            Ref: "createProductTopic",
+          },
+        },
+      },
+      awesoneEmailSubscription: {
+        Type: "AWS::SNS::Subscription",
+        Properties: {
+          Protocol: "Email",
+          Endpoint:
+            process.env
+              .AWS_PRODUCT_SERVICE_CREATE_AWESOME_PRODUCT_NOTIFICATION_EMAIL,
+          TopicArn: {
+            Ref: "createProductTopic",
+          },
+          FilterPolicyScope: "MessageBody",
+          FilterPolicy: { awesome: ["awesome"] },
+        },
+      },
+      catalogItemsQueue: {
+        Type: "AWS::SQS::Queue",
+        Properties: {
+          QueueName: "catalogItemsQueue",
+        },
+      },
       productsTable: {
         Type: "AWS::DynamoDB::Table",
         Properties: {

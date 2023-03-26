@@ -21,6 +21,11 @@ const serverlessConfiguration: AWS = {
           "arn:aws:s3:::import-service-csv-starage50830459/uploaded/",
         ],
       },
+      {
+        Effect: "Allow",
+        Action: ["sqs:SendMessage"],
+        Resource: ["arn:aws:sqs:::catalogItemsQueue"],
+      },
     ],
     apiGateway: {
       minimumCompressionSize: 1024,
