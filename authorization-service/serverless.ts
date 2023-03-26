@@ -1,32 +1,15 @@
 import type { AWS } from "@serverless/typescript";
 
-import importProductsFile from "@functions/importProductsFile";
-import importFileParser from "@functions/importFileParser";
+import basicAuthorizer from "@functions/basicAuthorizer";
 
 const serverlessConfiguration: AWS = {
-  service: "import-service",
+  service: "authorization-service",
   frameworkVersion: "3",
-  plugins: ["serverless-esbuild"],
+  plugins: ["serverless-esbuild", "serverless-dotenv-plugin"],
   provider: {
     name: "aws",
     region: "eu-west-2",
     runtime: "nodejs14.x",
-    iamRoleStatements: [
-      {
-        Effect: "Allow",
-        Action: ["s3:*"],
-        Resource: [
-          "arn:aws:s3:::import-service-csv-starage50830459",
-          "arn:aws:s3:::import-service-csv-starage50830459/*",
-          "arn:aws:s3:::import-service-csv-starage50830459/uploaded/",
-        ],
-      },
-      {
-        Effect: "Allow",
-        Action: ["sqs:SendMessage"],
-        Resource: ["arn:aws:sqs:::catalogItemsQueue"],
-      },
-    ],
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
@@ -36,7 +19,8 @@ const serverlessConfiguration: AWS = {
       NODE_OPTIONS: "--enable-source-maps --stack-trace-limit=1000",
     },
   },
-  functions: { importProductsFile, importFileParser },
+  // import the function via paths
+  functions: { basicAuthorizer },
   package: { individually: true },
   custom: {
     esbuild: {
